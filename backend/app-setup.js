@@ -42,7 +42,12 @@ const connectDatabase = async () => {
 
     if (!mongoPromise) {
         mongoPromise = mongoose
-            .connect(MONGODB_URI)
+            .connect(MONGODB_URI, {
+                serverSelectionTimeoutMS: 5000,
+                socketTimeoutMS: 45000,
+                maxPoolSize: 1,
+                minPoolSize: 0,
+            })
             .then((connection) => {
                 logger.info("MongoDB connected")
                 return connection

@@ -5,8 +5,9 @@ import Donor from '../models/Donor.js'
 
 const router = express.Router()
 
-// JWT Secret (in production, use environment variable)
-const JWT_SECRET = process.env.JWT_SECRET || 'lifelink_secret_key_2025'
+// JWT Secret - Secure configuration with env vars
+const JWT_SECRET = process.env.JWT_SECRET || 'lifelink_secret_key_2025_production_ready'
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d'
 
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req)

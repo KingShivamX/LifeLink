@@ -1,4 +1,4 @@
-# 🩸 LifeLink - Community Blood Donor Network
+# LifeLink - Community Blood Donor Network
 
 > **A modern, full-stack web application connecting blood donors and recipients in real-time during emergencies.**
 
@@ -8,15 +8,15 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4+-blue)](https://tailwindcss.com/)
 [![Socket.IO](https://img.shields.io/badge/Socket.IO-4.8+-orange)](https://socket.io/)
 
-## 🌟 Features
+## Features
 
 ### Core Functionality
-- **🔍 Real-time Donor Search** - Find compatible blood donors in your area
-- **📍 Geolocation Services** - Location-based matching and emergency response
-- **🚨 Emergency Requests** - Urgent blood request broadcasting system
-- **👥 Donor Registration** - Comprehensive donor onboarding with medical verification
-- **💬 Real-time Communication** - Instant notifications via Socket.IO
-- **📊 Analytics Dashboard** - Blood type distribution, donation statistics, and more
+- **Real-time Donor Search** - Find compatible blood donors in your area
+- **Geolocation Services** - Location-based matching and emergency response
+- **Emergency Requests** - Urgent blood request broadcasting system
+- **Donor Registration** - Comprehensive donor onboarding with medical verification
+- **Real-time Communication** - Instant notifications via Socket.IO
+- **Analytics Dashboard** - Blood type distribution, donation statistics, and more
 
 ### Modern Tech Stack
 - **Frontend**: React 18.3 with Vite, Tailwind CSS, Framer Motion
@@ -26,7 +26,7 @@
 - **API**: RESTful API with comprehensive error handling
 - **Real-time**: WebSocket connections for live updates
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Node.js 18+ and npm 9+
@@ -55,30 +55,30 @@
    - Frontend: http://localhost:3000
    - Backend: http://localhost:5000
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 LifeLink/
-├── 📁 frontend/                 # React frontend application
-│   ├── 📁 public/              # Static assets
-│   ├── 📁 src/
-│   │   ├── 📁 components/      # Reusable React components
-│   │   ├── 📁 pages/          # Page components
-│   │   ├── 📁 hooks/          # Custom React hooks
-│   │   ├── 📁 services/       # API service layer
-│   │   ├── 📁 store/          # Zustand state management
-│   │   ├── 📁 utils/          # Utility functions
+├── frontend/                 # React frontend application
+│   ├── public/              # Static assets
+│   ├── src/
+│   │   ├── components/      # Reusable React components
+│   │   ├── pages/          # Page components
+│   │   ├── hooks/          # Custom React hooks
+│   │   ├── services/       # API service layer
+│   │   ├── store/          # Zustand state management
+│   │   ├── utils/          # Utility functions
 │   │   ├── App.jsx            # Main App component
 │   │   └── main.jsx          # Application entry point
 │   ├── package.json
 │   └── vite.config.js        # Vite configuration
 │
-├── 📁 backend/                 # Node.js backend application
-│   ├── 📁 models/             # MongoDB schemas
-│   ├── 📁 routes/             # Express route handlers
-│   ├── 📁 middleware/         # Custom middleware
-│   ├── 📁 utils/              # Backend utilities
-│   ├── 📁 logs/               # Application logs
+├── backend/                 # Node.js backend application
+│   ├── models/             # MongoDB schemas
+│   ├── routes/             # Express route handlers
+│   ├── middleware/         # Custom middleware
+│   ├── utils/              # Backend utilities
+│   ├── logs/               # Application logs
 │   ├── server.js              # Express server setup
 │   └── package.json
 │
@@ -86,7 +86,7 @@ LifeLink/
 └── README.md
 ```
 
-## 🔧 Development
+## Development
 
 ### Available Scripts
 
@@ -123,7 +123,7 @@ JWT_SECRET=your-secret-key
 VITE_API_URL=http://localhost:5000/api
 ```
 
-## 🩸 Blood Type Compatibility
+## Blood Type Compatibility
 
 LifeLink automatically handles blood type compatibility:
 
@@ -138,7 +138,7 @@ LifeLink automatically handles blood type compatibility:
 | O+ | O+, O- |
 | O- | O- (Universal Donor) |
 
-## 🚨 Emergency Response System
+## Emergency Response System
 
 1. **Emergency Request Creation**
    - Critical priority assignment
@@ -155,7 +155,7 @@ LifeLink automatically handles blood type compatibility:
    - Request fulfillment monitoring
    - Response time analytics
 
-## 📱 API Documentation
+## API Documentation
 
 ### Authentication
 ```javascript
@@ -192,7 +192,7 @@ GET    /api/analytics/dashboard
 GET    /api/analytics/blood-types
 ```
 
-## 🔒 Security Features
+## Security Features
 
 - **Input Validation**: Comprehensive validation using express-validator
 - **Rate Limiting**: Protection against abuse and DDoS attacks
@@ -201,7 +201,7 @@ GET    /api/analytics/blood-types
 - **JWT Authentication**: Secure token-based authentication
 - **Password Hashing**: bcrypt for secure password storage
 
-## 🌍 Real-time Features
+## Real-time Features
 
 ### WebSocket Events
 ```javascript
@@ -216,7 +216,7 @@ GET    /api/analytics/blood-types
 'emergency-alert'   # Critical emergency broadcast
 ```
 
-## 🎨 UI/UX Features
+## UI/UX Features
 
 - **Responsive Design**: Mobile-first approach with Tailwind CSS
 - **Modern Animations**: Smooth transitions with Framer Motion
@@ -225,7 +225,7 @@ GET    /api/analytics/blood-types
 - **Toast Notifications**: Real-time user feedback
 - **Loading States**: Progressive loading indicators
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Frontend tests
@@ -238,7 +238,7 @@ cd backend && npm test
 npm run test:integration
 ```
 
-## 🚀 Deployment
+## Deployment
 
 ### Frontend (Netlify/Vercel)
 ```bash
@@ -257,7 +257,7 @@ npm run build:frontend
 docker-compose up --build
 ```
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
@@ -270,27 +270,27 @@ docker-compose up --build
 - Prettier for automatic code formatting
 - Conventional commits for clear git history
 
-## 🏥 Medical Disclaimers
+## Medical Disclaimers
 
-⚠️ **Important**: LifeLink is a community platform for connecting donors and recipients. 
+**Important**: LifeLink is a community platform for connecting donors and recipients. 
 
 - Always verify donor eligibility through proper medical screening
 - Follow local blood donation guidelines and regulations
 - Consult healthcare professionals for medical advice
 - Emergency cases should contact official emergency services (911)
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Medical Consultants**: Dr. Padma Nimbore and healthcare professionals
 - **Open Source Libraries**: React, Node.js, MongoDB, and the amazing open source community
 - **Design Inspiration**: Modern healthcare applications and emergency response systems
 - **Beta Testers**: Community volunteers who helped test and improve the platform
 
-## 📞 Support
+## Support
 
 - **Email**: help@lifelink.org
 - **Documentation**: [docs.lifelink.org](https://docs.lifelink.org)
@@ -300,6 +300,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <div align="center">
-  <p><strong>🩸 LifeLink - Connecting Hearts, Saving Lives 🩸</strong></p>
-  <p>Built with ❤️ for the community</p>
+  <p><strong>LifeLink - Connecting Hearts, Saving Lives</strong></p>
+  <p>Built with care for the community</p>
 </div>

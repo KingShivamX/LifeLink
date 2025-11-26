@@ -15,9 +15,12 @@ import EmergencyRequest from './pages/EmergencyRequest.jsx'
 
 // Hooks
 import { useScrollToTop } from './hooks/useScrollToTop'
+import { useRealTimeUpdates, useGlobalRealTimeUpdates } from './hooks/useRealTimeUpdates'
 
 function App() {
   useScrollToTop()
+  useRealTimeUpdates() // Enable real-time features
+  useGlobalRealTimeUpdates() // Enable global updates
 
   const pageVariants = {
     initial: { opacity: 0, y: 20 },

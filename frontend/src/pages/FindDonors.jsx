@@ -1,340 +1,496 @@
-import React, { useState, useEffect } from 'react';
-import { MapPinIcon, FunnelIcon, UserIcon, PhoneIcon, ClockIcon, HeartIcon } from '@heroicons/react/24/outline';
+import { useState, useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Helmet } from 'react-helmet-async'
+import { motion, AnimatePresence } from 'framer-motion'
+import toast from 'react-hot-toast'
+import {
+  MapPinIcon,
+  MagnifyingGlassIcon,
+  FunnelIcon,
+  HeartIcon,
+  PhoneIcon,
+  EnvelopeIcon,
+  ClockIcon,
+  UserIcon,
+  AdjustmentsHorizontalIcon,
+  XMarkIcon
+} from '@heroicons/react/24/outline'
+
+import { donorsAPI } from '../services/api'
+import { useAppStore } from '../store/useStore'
+import { bloodTypeStyles, locationUtils, dateUtils } from '../utils'
 
 const FindDonors = () => {
+  const queryClient = useQueryClient()
+  const { userLocation, getCurrentLocation } = useAppStore()
+  
   const [filters, setFilters] = useState({
     bloodType: '',
-    distance: '10',
-    availability: 'all'
-  });
-
-  const [donors, setDonors] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+    city: '',
+    available: true,
+    radius: 10,
+    searchTerm: ''
+  })
   
-  const mockDonors = [
-    {
-      id: 1,
-      name: 'Sarah Mitchell',
-      bloodType: 'O+',
-      distance: '0.8 miles',
-      availability: 'Available now',
-      lastDonation: '3 months ago',
-      totalDonations: 12,
-      rating: 4.9,
-      phone: '(555) 123-4567',
-      location: { lat: 40.7589, lng: -73.9851 }
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
+  const [selectedDonor, setSelectedDonor] = useState(null)
+  const [locationLoading, setLocationLoading] = useState(false)
+
+  const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
+
+  // Fetch donors with real-time updates
+  const { data: donorsData, isLoading, error, refetch } = useQuery({
+    queryKey: ['donors', filters, userLocation],
+    queryFn: async () => {
+      const params = {
+        ...filters,
+        ...(userLocation && {
+          lat: userLocation.latitude,
+          lng: userLocation.longitude,
+          radius: filters.radius
+        })
+      }
+      
+      // Remove empty filters
+      Object.keys(params).forEach(key => {
+        if (params[key] === '' || params[key] === null) {
+          delete params[key]
+        }
+      })
+      
+      const response = await donorsAPI.getDonors(params)
+      return response.data
     },
-    {
-      id: 2,
-      name: 'Michael Chen',
-      bloodType: 'A+',
-      distance: '1.2 miles',
-      availability: 'Available today',
-      lastDonation: '2 months ago',
-      totalDonations: 8,
-      rating: 5.0,
-      phone: '(555) 987-6543',
-      location: { lat: 40.7614, lng: -73.9776 }
-    },
-    {
-      id: 3,
-      name: 'Emma Rodriguez',
-      bloodType: 'B+',
-      distance: '2.1 miles',
-      availability: 'Available tomorrow',
-      lastDonation: '1 month ago',
-      totalDonations: 15,
-      rating: 4.8,
-      phone: '(555) 456-7890',
-      location: { lat: 40.7505, lng: -73.9934 }
-    },
-    {
-      id: 4,
-      name: 'James Wilson',
-      bloodType: 'AB-',
-      distance: '2.8 miles',
-      availability: 'Available this week',
-      lastDonation: '4 months ago',
-      totalDonations: 6,
-      rating: 4.7,
-      phone: '(555) 321-0987',
-      location: { lat: 40.7549, lng: -73.9840 }
-    },
-    {
-      id: 5,
-      name: 'Lisa Thompson',
-      bloodType: 'O-',
-      distance: '3.5 miles',
-      availability: 'Available now',
-      lastDonation: '2 months ago',
-      totalDonations: 20,
-      rating: 5.0,
-      phone: '(555) 654-3210',
-      location: { lat: 40.7648, lng: -73.9808 }
+    refetchInterval: 30000, // Auto-refresh every 30 seconds
+    staleTime: 10000 // Consider data stale after 10 seconds
+  })
+
+  // Get current location
+  const handleGetLocation = async () => {
+    setLocationLoading(true)
+    try {
+      await getCurrentLocation()
+      toast.success('Location updated! Showing nearby donors.')
+      refetch()
+    } catch (error) {
+      toast.error('Failed to get location. Please enable location services.')
+    } finally {
+      setLocationLoading(false)
     }
-  ];
+  }
 
-  useEffect(() => {
-    setTimeout(() => {
-      setDonors(mockDonors);
-      setIsLoading(false);
-    }, 1500);
-  }, []);
+  // Search donors by name or city
+  const handleSearch = (searchTerm) => {
+    setFilters(prev => ({ ...prev, searchTerm, city: searchTerm }))
+  }
 
-  const filteredDonors = donors.filter(donor => {
-    if (filters.bloodType && donor.bloodType !== filters.bloodType) return false;
-    if (filters.availability !== 'all') {
-      if (filters.availability === 'now' && !donor.availability.includes('now')) return false;
-      if (filters.availability === 'today' && !donor.availability.includes('today') && !donor.availability.includes('now')) return false;
+  // Filter change handler
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }))
+  }
+
+  // Clear all filters
+  const clearFilters = () => {
+    setFilters({
+      bloodType: '',
+      city: '',
+      available: true,
+      radius: 10,
+      searchTerm: ''
+    })
+  }
+
+  // Contact donor
+  const handleContactDonor = (donor) => {
+    setSelectedDonor(donor)
+    
+    // Create contact options
+    const contactOptions = []
+    
+    if (donor.phone) {
+      contactOptions.push({
+        type: 'phone',
+        value: donor.phone,
+        action: () => window.open(`tel:${donor.phone}`)
+      })
     }
-    return true;
-  });
+    
+    if (donor.email) {
+      contactOptions.push({
+        type: 'email', 
+        value: donor.email,
+        action: () => window.open(`mailto:${donor.email}?subject=Blood Donation Request - LifeLink`)
+      })
+    }
+    
+    // For demo, we'll show the first available option
+    if (contactOptions.length > 0) {
+      contactOptions[0].action()
+      toast.success(`Contacting ${donor.firstName} ${donor.lastName}`)
+    } else {
+      toast.error('Contact information not available')
+    }
+  }
 
-  const handleFilterChange = (e) => {
-    setFilters(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
+  // Calculate distance if user location is available
+  const calculateDistance = (donorCoords) => {
+    if (!userLocation || !donorCoords?.coordinates) return null
+    
+    const distance = locationUtils.calculateDistance(
+      userLocation.latitude,
+      userLocation.longitude,
+      donorCoords.coordinates[1],
+      donorCoords.coordinates[0]
+    )
+    
+    return locationUtils.formatDistance(distance)
+  }
 
-  const contactDonor = (donor) => {
-    window.open(`tel:${donor.phone}`);
-  };
-
-  const getAvailabilityColor = (availability) => {
-    if (availability.includes('now')) return 'text-green-600 bg-green-100';
-    if (availability.includes('today')) return 'text-blue-600 bg-blue-100';
-    if (availability.includes('tomorrow')) return 'text-yellow-600 bg-yellow-100';
-    return 'text-gray-600 bg-gray-100';
-  };
+  const donors = donorsData?.donors || []
+  const pagination = donorsData?.pagination
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-life-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-display font-bold text-gray-900 mb-4">
-            Find <span className="text-primary-600">Blood Donors</span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Connect with verified donors in your area. All donors are pre-screened and ready to help.
-          </p>
-        </div>
+    <>
+      <Helmet>
+        <title>Find Blood Donors - LifeLink Network</title>
+        <meta name="description" content="Search and connect with verified blood donors in your area. Find compatible donors by blood type, location, and availability." />
+      </Helmet>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
-              <div className="flex items-center space-x-3 mb-6">
-                <FunnelIcon className="h-6 w-6 text-primary-600" />
-                <h2 className="text-xl font-semibold text-gray-900">Search Filters</h2>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-8"
+          >
+            <div className="flex justify-center mb-4">
+              <div className="bg-blue-100 p-3 rounded-full">
+                <MapPinIcon className="h-8 w-8 text-blue-600" />
               </div>
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+              Find Blood Donors
+            </h1>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Connect with verified donors in your community. Search by blood type, location, and availability.
+            </p>
+          </motion.div>
 
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Blood Type Needed</label>
-                  <select
-                    name="bloodType"
-                    value={filters.bloodType}
-                    onChange={handleFilterChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  >
-                    <option value="">All blood types</option>
-                    {bloodTypes.map(type => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
-                </div>
+          {/* Search and Filters */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white rounded-xl shadow-lg p-6 mb-8"
+          >
+            {/* Search Bar */}
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <div className="flex-1 relative">
+                <MagnifyingGlassIcon className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search by city or donor name..."
+                  value={filters.searchTerm}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              
+              <button
+                onClick={handleGetLocation}
+                disabled={locationLoading}
+                className={`px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 ${
+                  locationLoading
+                    ? 'bg-gray-400 text-white cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+              >
+                <MapPinIcon className="h-5 w-5" />
+                <span>{locationLoading ? 'Detecting...' : 'Use My Location'}</span>
+              </button>
+              
+              <button
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2"
+              >
+                <FunnelIcon className="h-5 w-5" />
+                <span>Filters</span>
+              </button>
+            </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Maximum Distance: {filters.distance} miles
-                  </label>
-                  <input
-                    type="range"
-                    name="distance"
-                    min="1"
-                    max="50"
-                    value={filters.distance}
-                    onChange={handleFilterChange}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                  />
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>1 mile</span>
-                    <span>50 miles</span>
+            {/* Quick Blood Type Filter */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              <span className="text-sm font-medium text-gray-700 self-center mr-2">
+                Blood Type:
+              </span>
+              {bloodTypes.map(type => (
+                <button
+                  key={type}
+                  onClick={() => handleFilterChange('bloodType', filters.bloodType === type ? '' : type)}
+                  className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+                    filters.bloodType === type
+                      ? 'bg-red-600 text-white border-red-600'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
+              
+              {(filters.bloodType || filters.city || filters.searchTerm) && (
+                <button
+                  onClick={clearFilters}
+                  className="px-3 py-1.5 text-sm text-red-600 hover:text-red-700 flex items-center space-x-1"
+                >
+                  <XMarkIcon className="h-4 w-4" />
+                  <span>Clear</span>
+                </button>
+              )}
+            </div>
+
+            {/* Advanced Filters */}
+            <AnimatePresence>
+              {showAdvancedFilters && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="border-t pt-4 grid grid-cols-1 md:grid-cols-3 gap-4"
+                >
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Search Radius
+                    </label>
+                    <select
+                      value={filters.radius}
+                      onChange={(e) => handleFilterChange('radius', parseInt(e.target.value))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value={5}>5 km</option>
+                      <option value={10}>10 km</option>
+                      <option value={25}>25 km</option>
+                      <option value={50}>50 km</option>
+                      <option value={100}>100 km</option>
+                    </select>
                   </div>
-                </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Availability
+                    </label>
+                    <select
+                      value={filters.available}
+                      onChange={(e) => handleFilterChange('available', e.target.value === 'true')}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value={true}>Available Now</option>
+                      <option value={false}>All Donors</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      City
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter city name"
+                      value={filters.city}
+                      onChange={(e) => handleFilterChange('city', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Availability</label>
-                  <select
-                    name="availability"
-                    value={filters.availability}
-                    onChange={handleFilterChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  >
-                    <option value="all">All availability</option>
-                    <option value="now">Available now</option>
-                    <option value="today">Available today</option>
-                    <option value="week">Available this week</option>
-                  </select>
-                </div>
-
-                <div className="bg-gradient-to-r from-primary-50 to-life-50 rounded-lg p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2">Quick Tip</h3>
+          {/* Results Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            {/* Results Header */}
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {isLoading ? 'Searching...' : `${donors.length} Donors Found`}
+                </h2>
+                {pagination && (
                   <p className="text-sm text-gray-600">
-                    Universal donors (O-) can donate to anyone. Consider reaching out to O- donors for emergency situations.
+                    Showing {donors.length} of {pagination.totalDonors} total donors
                   </p>
-                </div>
+                )}
               </div>
-            </div>
-          </div>
-
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
-              <div className="bg-gray-800 h-80 flex items-center justify-center">
-                <div className="text-center text-white">
-                  <MapPinIcon className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-xl font-semibold mb-2">Interactive Donor Map</h3>
-                  <p className="text-gray-300">Map integration with Google Maps API</p>
-                  <p className="text-sm text-gray-400 mt-2">Showing {filteredDonors.length} donors in your area</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Available Donors ({filteredDonors.length})
-                </h3>
-                <div className="text-sm text-gray-500">
-                  Showing results within {filters.distance} miles
-                </div>
-              </div>
-
-              {isLoading ? (
-                <div className="space-y-4">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="bg-white rounded-xl p-6 animate-pulse">
-                      <div className="flex items-start space-x-4">
-                        <div className="bg-gray-200 rounded-full h-16 w-16"></div>
-                        <div className="flex-1 space-y-2">
-                          <div className="bg-gray-200 h-4 rounded w-1/3"></div>
-                          <div className="bg-gray-200 h-3 rounded w-1/4"></div>
-                          <div className="bg-gray-200 h-3 rounded w-1/2"></div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {filteredDonors.map((donor) => (
-                    <div key={donor.id} className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 border border-gray-100">
-                      <div className="p-6">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-start space-x-4">
-                            <div className="bg-gradient-to-br from-primary-100 to-life-100 rounded-full p-4">
-                              <UserIcon className="h-8 w-8 text-primary-600" />
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-3 mb-2">
-                                <h4 className="text-lg font-semibold text-gray-900">{donor.name}</h4>
-                                <div className="flex items-center space-x-1">
-                                  <HeartIcon className="h-4 w-4 text-yellow-400 fill-current" />
-                                  <span className="text-sm font-medium text-gray-600">{donor.rating}</span>
-                                </div>
-                              </div>
-                              
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                                <div className="flex items-center space-x-2">
-                                  <div className="bg-primary-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-                                    {donor.bloodType}
-                                  </div>
-                                </div>
-                                
-                                <div className="flex items-center space-x-2">
-                                  <MapPinIcon className="h-4 w-4 text-gray-400" />
-                                  <span className="text-sm text-gray-600">{donor.distance}</span>
-                                </div>
-                                
-                                <div className="flex items-center space-x-2">
-                                  <ClockIcon className="h-4 w-4 text-gray-400" />
-                                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${getAvailabilityColor(donor.availability)}`}>
-                                    {donor.availability}
-                                  </span>
-                                </div>
-                                
-                                <div className="text-sm text-gray-600">
-                                  {donor.totalDonations} donations
-                                </div>
-                              </div>
-                              
-                              <div className="flex items-center justify-between">
-                                <p className="text-sm text-gray-500">
-                                  Last donation: {donor.lastDonation}
-                                </p>
-                                
-                                <button
-                                  onClick={() => contactDonor(donor)}
-                                  className="bg-gradient-to-r from-primary-600 to-life-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-primary-700 hover:to-life-700 transition-all duration-200 flex items-center space-x-2 shadow-md hover:shadow-lg transform hover:scale-105"
-                                >
-                                  <PhoneIcon className="h-4 w-4" />
-                                  <span>Contact</span>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                  {filteredDonors.length === 0 && (
-                    <div className="text-center py-12">
-                      <HeartIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">No donors found</h3>
-                      <p className="text-gray-600 mb-6">
-                        Try adjusting your filters or expanding your search radius
-                      </p>
-                      <button 
-                        onClick={() => setFilters({ bloodType: '', distance: '25', availability: 'all' })}
-                        className="bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors duration-200"
-                      >
-                        Reset Filters
-                      </button>
-                    </div>
-                  )}
+              
+              {userLocation && (
+                <div className="text-sm text-green-600 flex items-center space-x-1">
+                  <MapPinIcon className="h-4 w-4" />
+                  <span>Location detected</span>
                 </div>
               )}
             </div>
-          </div>
-        </div>
 
-        <div className="mt-12 bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-200 rounded-2xl p-8 text-center">
-          <h3 className="text-2xl font-bold text-red-800 mb-4">Can't Find What You Need?</h3>
-          <p className="text-red-700 mb-6">
-            If you can't find a compatible donor, consider posting an emergency request to reach our entire network.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <a 
-              href="/emergency"
-              className="bg-red-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors duration-200 flex items-center justify-center space-x-2"
-            >
-              <PhoneIcon className="h-5 w-5" />
-              <span>Emergency Request</span>
-            </a>
-            <a 
-              href="/request"
-              className="bg-white text-red-600 border-2 border-red-300 px-8 py-3 rounded-lg font-semibold hover:bg-red-50 transition-colors duration-200"
-            >
-              Regular Blood Request
-            </a>
-          </div>
+            {/* Loading State */}
+            {isLoading && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="bg-white rounded-xl shadow-md p-6 animate-pulse">
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-full mb-4"></div>
+                    <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && (
+              <div className="text-center py-12">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
+                  <div className="text-red-600 mb-2">Error Loading Donors</div>
+                  <p className="text-red-700 mb-4">{error.message}</p>
+                  <button
+                    onClick={() => refetch()}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Donors Grid */}
+            {!isLoading && !error && donors.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {donors.map((donor, index) => (
+                  <motion.div
+                    key={donor._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 border border-gray-100"
+                  >
+                    {/* Donor Header */}
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="bg-gray-100 p-2 rounded-full">
+                          <UserIcon className="h-6 w-6 text-gray-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-gray-900">
+                            {donor.firstName} {donor.lastName}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            {donor.address?.city}, {donor.address?.state}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className={`px-2 py-1 text-xs font-medium rounded-full ${bloodTypeStyles[donor.bloodType]}`}>
+                        {donor.bloodType}
+                      </div>
+                    </div>
+
+                    {/* Donor Details */}
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Availability:</span>
+                        <span className={`font-medium ${
+                          donor.availability?.isAvailable 
+                            ? 'text-green-600' 
+                            : 'text-red-600'
+                        }`}>
+                          {donor.availability?.isAvailable ? 'Available' : 'Not Available'}
+                        </span>
+                      </div>
+                      
+                      {donor.donationCount > 0 && (
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Donations:</span>
+                          <span className="text-blue-600 font-medium">
+                            {donor.donationCount} times
+                          </span>
+                        </div>
+                      )}
+                      
+                      {calculateDistance(donor.location) && (
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Distance:</span>
+                          <span className="text-gray-900 font-medium flex items-center space-x-1">
+                            <MapPinIcon className="h-3 w-3" />
+                            <span>{calculateDistance(donor.location)}</span>
+                          </span>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Last Active:</span>
+                        <span className="text-gray-500">
+                          {dateUtils.formatTimeAgo(donor.lastActive)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Emergency Badge */}
+                    {donor.availability?.emergencyOnly && (
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-2 mb-4">
+                        <div className="flex items-center space-x-2 text-red-700 text-xs">
+                          <ClockIcon className="h-4 w-4" />
+                          <span>Emergency cases only</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Contact Button */}
+                    <button
+                      onClick={() => handleContactDonor(donor)}
+                      disabled={!donor.availability?.isAvailable}
+                      className={`w-full py-2.5 px-4 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2 ${
+                        donor.availability?.isAvailable
+                          ? 'bg-blue-600 text-white hover:bg-blue-700'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      <PhoneIcon className="h-4 w-4" />
+                      <span>
+                        {donor.availability?.isAvailable ? 'Contact Donor' : 'Not Available'}
+                      </span>
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!isLoading && !error && donors.length === 0 && (
+              <div className="text-center py-12">
+                <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-12 max-w-md mx-auto">
+                  <MapPinIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    No Donors Found
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Try adjusting your search filters or expanding the search radius.
+                  </p>
+                  <button
+                    onClick={clearFilters}
+                    className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              </div>
+            )}
+          </motion.div>
         </div>
       </div>
-    </div>
-  );
-};
+    </>
+  )
+}
 
-export default FindDonors;
+export default FindDonors

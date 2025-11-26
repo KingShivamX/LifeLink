@@ -35,12 +35,12 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://shivamhippalgave_d
 
 mongoose.connect(MONGODB_URI)
   .then(() => {
-    logger.info('✅ MongoDB Connected Successfully')
-    console.log('✅ MongoDB Connected Successfully')
+    logger.info('MongoDB Connected Successfully')
+    console.log('MongoDB Connected Successfully')
   })
   .catch((error) => {
-    logger.error('❌ MongoDB Connection Error:', error)
-    console.error('❌ MongoDB Connection Error:', error)
+    logger.error('MongoDB Connection Error:', error)
+    console.error('MongoDB Connection Error:', error)
     process.exit(1)
   })
 
@@ -152,10 +152,10 @@ app.use(errorHandler)
 const PORT = process.env.PORT || 5000
 
 server.listen(PORT, () => {
-  logger.info(`🚀 LifeLink API Server running on port ${PORT}`)
-  console.log(`🚀 LifeLink API Server running on port ${PORT}`)
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`)
-  console.log(`📱 Socket.IO enabled for real-time features`)
+  logger.info(`LifeLink API Server running on port ${PORT}`)
+  console.log(`LifeLink API Server running on port ${PORT}`)
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`)
+  console.log(`Socket.IO enabled for real-time features`)
 })
 
 // Graceful shutdown

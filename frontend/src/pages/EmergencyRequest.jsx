@@ -408,9 +408,9 @@ const EmergencyRequest = () => {
         <div className="mt-8 bg-gradient-to-r from-red-100 to-orange-100 rounded-xl p-6 text-center">
           <h3 className="text-lg font-bold text-gray-900 mb-3">Emergency Response Time</h3>
           <div className="text-sm text-gray-700 space-y-1">
-            <p>⚡ Donors typically respond within <strong>5-15 minutes</strong></p>
-            <p>📱 Keep your phone available for immediate contact</p>
-            <p>🏥 Coordinate meeting location at the specified hospital</p>
+            <p>Donors typically respond within <strong>5-15 minutes</strong></p>
+            <p>Keep your phone available for immediate contact</p>
+            <p>Coordinate meeting location at the specified hospital</p>
           </div>
         </div>
       </div>

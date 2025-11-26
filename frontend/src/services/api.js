@@ -28,13 +28,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const message = error.response?.data?.message || 'Something went wrong'
-    
-    // Don't show toast for 401 errors (handled by auth context)
-    if (error.response?.status !== 401) {
-      toast.error(message)
-    }
-    
+    // Don't automatically show toast - let components handle errors
+    // This prevents duplicate toasts when mutations also handle errors
     return Promise.reject(error)
   }
 )

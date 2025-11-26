@@ -49,9 +49,22 @@ const RequestBlood = () => {
       toast.success('Blood request submitted successfully!');
     },
     onError: (error) => {
-      const errorMessage = error.response?.data?.message || 'Failed to submit blood request';
-      toast.error(errorMessage);
       console.error('Error creating request:', error);
+      
+      // Get detailed error message
+      const errorData = error.response?.data;
+      let errorMessage = 'Failed to submit blood request';
+      
+      if (errorData?.message) {
+        errorMessage = errorData.message;
+      }
+      
+      // Show validation errors if available
+      if (errorData?.errors && Array.isArray(errorData.errors)) {
+        errorMessage = errorData.errors.map(err => err.msg || err.message).join(', ');
+      }
+      
+      toast.error(errorMessage, { duration: 5000 });
     }
   });
 

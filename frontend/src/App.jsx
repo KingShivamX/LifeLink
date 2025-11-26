@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -42,90 +42,88 @@ function App() {
         <link rel="canonical" href="https://lifelink.health" />
       </Helmet>
       
-      <Router>
-        <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
-          <Header />
-          
-          <main className="flex-grow">
-            <AnimatePresence mode="wait">
-              <Routes>
-                <Route 
-                  path="/" 
-                  element={
-                    <motion.div
-                      initial="initial"
-                      animate="in"
-                      exit="out"
-                      variants={pageVariants}
-                      transition={pageTransition}
-                    >
-                      <Home />
-                    </motion.div>
-                  } 
-                />
-                <Route 
-                  path="/register" 
-                  element={
-                    <motion.div
-                      initial="initial"
-                      animate="in"
-                      exit="out"
-                      variants={pageVariants}
-                      transition={pageTransition}
-                    >
-                      <DonorRegistration />
-                    </motion.div>
-                  } 
-                />
-                <Route 
-                  path="/find-donors" 
-                  element={
-                    <motion.div
-                      initial="initial"
-                      animate="in"
-                      exit="out"
-                      variants={pageVariants}
-                      transition={pageTransition}
-                    >
-                      <FindDonors />
-                    </motion.div>
-                  } 
-                />
-                <Route 
-                  path="/request" 
-                  element={
-                    <motion.div
-                      initial="initial"
-                      animate="in"
-                      exit="out"
-                      variants={pageVariants}
-                      transition={pageTransition}
-                    >
-                      <RequestBlood />
-                    </motion.div>
-                  } 
-                />
-                <Route 
-                  path="/emergency" 
-                  element={
-                    <motion.div
-                      initial="initial"
-                      animate="in"
-                      exit="out"
-                      variants={pageVariants}
-                      transition={pageTransition}
-                    >
-                      <EmergencyRequest />
-                    </motion.div>
-                  } 
-                />
-              </Routes>
-            </AnimatePresence>
-          </main>
-          
-          <Footer />
-        </div>
-      </Router>
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
+        <Header />
+        
+        <main className="flex-grow">
+          <AnimatePresence mode="wait">
+            <Routes>
+              <Route 
+                path="/" 
+                element={
+                  <motion.div
+                    initial="initial"
+                    animate="in"
+                    exit="out"
+                    variants={pageVariants}
+                    transition={pageTransition}
+                  >
+                    <Home />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path="/register" 
+                element={
+                  <motion.div
+                    initial="initial"
+                    animate="in"
+                    exit="out"
+                    variants={pageVariants}
+                    transition={pageTransition}
+                  >
+                    <DonorRegistration />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path="/find-donors" 
+                element={
+                  <motion.div
+                    initial="initial"
+                    animate="in"
+                    exit="out"
+                    variants={pageVariants}
+                    transition={pageTransition}
+                  >
+                    <FindDonors />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path="/request" 
+                element={
+                  <motion.div
+                    initial="initial"
+                    animate="in"
+                    exit="out"
+                    variants={pageVariants}
+                    transition={pageTransition}
+                  >
+                    <RequestBlood />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path="/emergency" 
+                element={
+                  <motion.div
+                    initial="initial"
+                    animate="in"
+                    exit="out"
+                    variants={pageVariants}
+                    transition={pageTransition}
+                  >
+                    <EmergencyRequest />
+                  </motion.div>
+                } 
+              />
+            </Routes>
+          </AnimatePresence>
+        </main>
+        
+        <Footer />
+      </div>
     </>
   )
 }

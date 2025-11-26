@@ -59,7 +59,7 @@ const FindDonors = () => {
       })
       
       const response = await donorsAPI.getDonors(params)
-      return response.data
+      return response.data?.data ?? response.data
     },
     refetchInterval: 30000, // Auto-refresh every 30 seconds
     staleTime: 10000 // Consider data stale after 10 seconds

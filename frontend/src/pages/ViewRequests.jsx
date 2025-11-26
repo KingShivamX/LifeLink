@@ -226,7 +226,7 @@ const ViewRequests = () => {
 
                       <div className="flex items-center space-x-2 text-sm text-gray-600">
                         <MapPinIcon className="h-4 w-4" />
-                        <span>{request.medicalInfo?.hospital}, {request.location?.city}</span>
+                        <span>{request.medicalInfo?.hospital?.name || request.medicalInfo?.hospital}, {request.location?.city}</span>
                       </div>
 
                       <div className="flex items-center space-x-2 text-sm text-gray-600">
@@ -236,9 +236,9 @@ const ViewRequests = () => {
                         </span>
                       </div>
 
-                      {request.medicalInfo?.condition && (
+                      {(request.medicalInfo?.diagnosis || request.medicalInfo?.condition) && (
                         <div className="text-sm text-gray-600">
-                          <span className="font-medium">Condition:</span> {request.medicalInfo.condition}
+                          <span className="font-medium">Condition:</span> {request.medicalInfo?.diagnosis || request.medicalInfo?.condition}
                         </div>
                       )}
                     </div>

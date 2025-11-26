@@ -30,3 +30,9 @@
 {"level":"info","message":"User disconnected: qLnbim1KNs5Dc9sRAAAH","service":"lifelink-api","timestamp":"2025-11-26 14:33:41"}
 {"level":"info","message":"::1 - - [26/Nov/2025:09:03:41 +0000] \"GET /api/donors?available=true&radius=10 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\"","service":"lifelink-api","timestamp":"2025-11-26 14:33:41"}
 {"level":"info","message":"User connected: C2H98y4o0q1DhholAAAJ","service":"lifelink-api","timestamp":"2025-11-26 14:33:41"}
+{"level":"info","message":"LifeLink API Server running on port 5000","service":"lifelink-api","timestamp":"2025-11-26 14:34:37"}
+{"level":"info","message":"MongoDB Connected Successfully","service":"lifelink-api","timestamp":"2025-11-26 14:34:37"}
+{"level":"info","message":"::1 - - [26/Nov/2025:09:04:40 +0000] \"GET /api/donors?available=true&radius=10 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\"","service":"lifelink-api","timestamp":"2025-11-26 14:34:40"}
+{"level":"info","message":"User connected: T2cH3h125jasbwitAAAB","service":"lifelink-api","timestamp":"2025-11-26 14:34:41"}
+{"level":"info","message":"::1 - - [26/Nov/2025:09:04:41 +0000] \"GET /api/donors?available=true&radius=10 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\"","service":"lifelink-api","timestamp":"2025-11-26 14:34:41"}
+{"level":"info","message":"::1 - - [26/Nov/2025:09:04:50 +0000] \"GET /api/donors?available=true&radius=10 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\"","service":"lifelink-api","timestamp":"2025-11-26 14:34:50"}

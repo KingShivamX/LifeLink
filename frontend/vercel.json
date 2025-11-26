@@ -6,6 +6,12 @@
   "installCommand": "npm install",
   "env": {
     "VITE_API_URL": "https://life-link-wt.vercel.app/api"  
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
 

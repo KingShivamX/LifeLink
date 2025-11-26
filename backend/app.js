@@ -22,8 +22,10 @@ const defaultOrigins =
     process.env.NODE_ENV === "production"
         ? ["https://lifelink.health"]
         : ["http://localhost:3000", "http://localhost:5173"]
-const customOrigins = process.env.CORS_ORIGINS
-    ? process.env.CORS_ORIGINS.split(",")
+const originsEnv = process.env.CORS_ORIGINS || process.env.ALLOWED_ORIGINS || ""
+const customOrigins = originsEnv
+    ? originsEnv
+          .split(",")
           .map((origin) => origin.trim())
           .filter(Boolean)
     : null

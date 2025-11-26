@@ -1,0 +1,13 @@
+const config = {
+  version: 2,
+  framework: "vite",
+  buildCommand: "npm run build",
+  outputDirectory: "dist",
+  installCommand: "npm install",
+  env: {
+    VITE_API_URL: "https://your-backend-domain.vercel.app/api"
+  }
+}
+
+export default config
+

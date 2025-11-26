@@ -2,7 +2,7 @@ import express from 'express'
 import { body, validationResult, query } from 'express-validator'
 import BloodRequest from '../models/BloodRequest.js'
 import Donor from '../models/Donor.js'
-import { io } from '../server.js'
+import { emitSocketEvent } from '../utils/socket.js'
 
 const router = express.Router()
 
@@ -123,7 +123,7 @@ router.post('/', [
     )
     
     // Emit real-time notification
-    io.emit('new-blood-request', {
+    emitSocketEvent('new-blood-request', {
       requestId: bloodRequest._id,
       bloodType: requestData.patient.bloodType,
       urgency: requestData.urgencyLevel,
@@ -306,7 +306,7 @@ router.post('/:id/match', [
     await request.matchWithDonor(donorId, notes)
     
     // Notify in real-time
-    io.emit('donor-matched', {
+    emitSocketEvent('donor-matched', {
       requestId: request._id,
       donorId: donorId,
       bloodType: request.patient.bloodType

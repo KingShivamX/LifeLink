@@ -1,0 +1,21 @@
+const config = {
+  version: 2,
+  functions: {
+    "api/index.js": {
+      runtime: "nodejs18.x",
+      memory: 1024,
+      maxDuration: 60
+    }
+  },
+  installCommand: "npm install",
+  buildCommand: "npm install",
+  routes: [
+    {
+      src: "/(.*)",
+      dest: "/api/index.js"
+    }
+  ]
+}
+
+export default config
+

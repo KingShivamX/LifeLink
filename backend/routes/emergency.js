@@ -2,7 +2,7 @@ import express from 'express'
 import { body, validationResult } from 'express-validator'
 import BloodRequest from '../models/BloodRequest.js'
 import Donor from '../models/Donor.js'
-import { io } from '../server.js'
+import { emitSocketEvent } from '../utils/socket.js'
 
 const router = express.Router()
 
@@ -59,7 +59,7 @@ router.post('/request', [
     }).select('firstName lastName phone bloodType address')
     
     // Broadcast emergency to all nearby donors
-    io.emit('emergency-alert', {
+    emitSocketEvent('emergency-alert', {
       requestId: emergencyRequest._id,
       patient: {
         bloodType: emergencyData.patient.bloodType,

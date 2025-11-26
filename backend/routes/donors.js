@@ -2,7 +2,7 @@ import express from "express"
 import { body, validationResult, query } from "express-validator"
 import Donor from "../models/Donor.js"
 import BloodRequest from "../models/BloodRequest.js"
-import { io } from "../server.js"
+import { emitSocketEvent } from "../utils/socket.js"
 
 const router = express.Router()
 
@@ -37,21 +37,25 @@ router.get(
     handleValidationErrors,
     async (req, res) => {
         try {
-            const {
-                bloodType,
-                city,
-                available,
-                lat,
-                lng,
-                radius = 10,
-                page = 1,
-                limit = 20,
-            } = req.query
+             const {
+                 bloodType,
+                 city,
+                 available,
+                 lat,
+                 lng,
+                 radius = 10,
+                 page = 1,
+                 limit = 20,
+                 verified,
+             } = req.query
 
-            let query = {
-                isActive: true,
-                isVerified: true,
-            }
+             let query = {
+                 isActive: true,
+             }
+
+             if (verified !== undefined) {
+                 query.isVerified = verified === "true"
+             }
 
             // Filter by blood type
             if (bloodType) {
@@ -254,7 +258,7 @@ router.post(
             delete donorResponse.verificationToken
 
             // Notify nearby blood requests about new donor
-            io.emit("donor-available", {
+            emitSocketEvent("donor-available", {
                 bloodType: donor.bloodType,
                 city: donor.address.city,
                 donorId: donor._id,
@@ -453,7 +457,7 @@ router.put(
 
             // Notify about availability change
             if (isAvailable) {
-                io.emit("donor-available", {
+                emitSocketEvent("donor-available", {
                     bloodType: donor.bloodType,
                     city: donor.address.city,
                     donorId: donor._id,

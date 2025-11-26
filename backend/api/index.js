@@ -10,6 +10,14 @@ export const config = {
     },
 }
 
+app.get("/", (req, res) => {
+    res.status(200).json({
+        status: "OK",
+        message: "LifeLink API is running",
+        timestamp: new Date().toISOString(),
+    })
+})
+
 export default async function vercelHandler(req, res) {
     // Fast health check without DB connection
     if (req.url === "/" || req.url === "/api" || req.url === "/api/") {

@@ -15,7 +15,7 @@ export function useRealTimeUpdates() {
   // Initialize socket connection
   const initializeSocket = useCallback(() => {
     if (!socket) {
-      socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000', {
+      socket = io(import.meta.env.VITE_SOCKET_URL || 'https://lifelink-omh5.onrender.com', {
         autoConnect: true,
         reconnection: true,
         reconnectionDelay: 1000,

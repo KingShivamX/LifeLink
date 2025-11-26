@@ -9,7 +9,7 @@ import Footer from './components/Footer'
 // Pages
 import Home from './pages/Home'
 import FindDonors from './pages/FindDonors'
-import RegisterDonor from './pages/RegisterDonor'
+import DonorRegistration from './pages/DonorRegistration'
 import RequestBlood from './pages/RequestBlood'
 import DonorDetail from './pages/DonorDetail'
 import ViewRequests from './pages/ViewRequests'
@@ -74,7 +74,7 @@ function App() {
                     variants={pageVariants}
                     transition={pageTransition}
                   >
-                    <RegisterDonor />
+                    <DonorRegistration />
                   </motion.div>
                 } 
               />

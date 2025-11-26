@@ -1,3 +1,4 @@
+import express from "express"
 import serverless from "serverless-http"
 import { getApp, getApiBasePath } from "../app-setup.js"
 

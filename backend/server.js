@@ -30,8 +30,8 @@ const io = new Server(server, {
   }
 })
 
-// MongoDB Connection
-const MONGODB_URI = 'mongodb+srv://shivamhippalgave_db_user:ee8jd4FBOzPqLoUv@cluster0.gwufynq.mongodb.net/lifelink?retryWrites=true&w=majority&appName=Cluster0'
+// MongoDB Connection - Uses env vars for security (falls back to hardcoded as requested)
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://shivamhippalgave_db_user:ee8jd4FBOzPqLoUv@cluster0.gwufynq.mongodb.net/lifelink?retryWrites=true&w=majority&appName=Cluster0'
 
 mongoose.connect(MONGODB_URI)
   .then(() => {

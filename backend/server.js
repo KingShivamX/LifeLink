@@ -1,7 +1,7 @@
 import { createServer } from "http"
 import { Server } from "socket.io"
 import mongoose from "mongoose"
-import { getApp } from "./app.js"
+import { getApp } from "./app-setup.js"
 import { logger } from "./utils/logger.js"
 import { setSocketServerInstance } from "./utils/socket.js"
 

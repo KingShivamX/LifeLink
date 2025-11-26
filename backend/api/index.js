@@ -1,5 +1,5 @@
 import serverless from "serverless-http"
-import { getApp, getApiBasePath } from "../app.js"
+import { getApp, getApiBasePath } from "../app-setup.js"
 
 let handler
 

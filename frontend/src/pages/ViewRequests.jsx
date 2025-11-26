@@ -189,56 +189,58 @@ const ViewRequests = () => {
 
           {/* Requests Grid */}
           {!isLoading && !error && requests.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {requests.map((request) => (
                 <motion.div
                   key={request._id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border-l-4 ${
+                  whileHover={{ y: -4, shadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                  className={`bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border-l-8 ${
                     request.urgencyLevel === 'critical' ? 'border-red-500' :
                     request.urgencyLevel === 'high' ? 'border-orange-500' :
                     'border-green-500'
                   }`}
                 >
-                  <div className="p-6">
+                  <div className="p-8">
                     {/* Header */}
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-start justify-between mb-6">
                       <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <div className={`px-3 py-1 text-sm font-bold rounded-full ${bloodTypeStyles[request.bloodRequirement?.bloodType]}`}>
-                            {request.bloodRequirement?.bloodType}
+                        <div className="flex items-center space-x-3 mb-3">
+                          <div className={`px-4 py-2 text-lg font-bold rounded-full ${bloodTypeStyles[request.patient?.bloodType]}`}>
+                            {request.patient?.bloodType}
                           </div>
                           {getUrgencyBadge(request.urgencyLevel)}
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-2xl font-bold text-gray-900">
                           {request.bloodRequirement?.unitsNeeded} {request.bloodRequirement?.unitsNeeded === 1 ? 'Unit' : 'Units'} Needed
                         </h3>
                       </div>
                     </div>
 
                     {/* Details */}
-                    <div className="space-y-3 mb-4">
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <UserIcon className="h-4 w-4" />
-                        <span>Patient: {request.patient?.firstName} {request.patient?.lastName?.[0]}.</span>
+                    <div className="space-y-4 mb-6">
+                      <div className="flex items-center space-x-3 text-gray-700">
+                        <UserIcon className="h-5 w-5 text-red-600 flex-shrink-0" />
+                        <span className="font-medium">Patient: {request.patient?.firstName} {request.patient?.lastName?.[0]}.</span>
                       </div>
 
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <MapPinIcon className="h-4 w-4" />
+                      <div className="flex items-center space-x-3 text-gray-700">
+                        <MapPinIcon className="h-5 w-5 text-red-600 flex-shrink-0" />
                         <span>{request.medicalInfo?.hospital?.name || request.medicalInfo?.hospital}, {request.location?.city}</span>
                       </div>
 
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <ClockIcon className="h-4 w-4" />
+                      <div className="flex items-center space-x-3 text-gray-700">
+                        <ClockIcon className="h-5 w-5 text-red-600 flex-shrink-0" />
                         <span>
                           Needed by: {new Date(request.medicalInfo?.transfusionDate).toLocaleDateString()}
                         </span>
                       </div>
 
                       {(request.medicalInfo?.diagnosis || request.medicalInfo?.condition) && (
-                        <div className="text-sm text-gray-600">
-                          <span className="font-medium">Condition:</span> {request.medicalInfo?.diagnosis || request.medicalInfo?.condition}
+                        <div className="bg-gray-50 rounded-lg p-4 mt-4">
+                          <span className="text-sm font-semibold text-gray-600 block mb-1">Medical Condition:</span>
+                          <span className="text-gray-900">{request.medicalInfo?.diagnosis || request.medicalInfo?.condition}</span>
                         </div>
                       )}
                     </div>
@@ -247,24 +249,25 @@ const ViewRequests = () => {
                     <div className="flex items-center space-x-3">
                       <Link
                         to={`/request/${request._id}`}
-                        className="flex-1 bg-gradient-to-r from-red-600 to-pink-600 text-white px-4 py-2 rounded-lg font-medium hover:from-red-700 hover:to-pink-700 transition-all duration-200 text-center"
+                        className="flex-1 bg-gradient-to-r from-red-600 to-pink-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-red-700 hover:to-pink-700 transition-all duration-200 text-center shadow-md hover:shadow-lg"
                       >
                         View Details
                       </Link>
                       
                       <a
-                        href={`tel:${request.requestor?.phone}`}
-                        className="px-4 py-2 border-2 border-red-600 text-red-600 rounded-lg font-medium hover:bg-red-50 transition-colors"
+                        href={`tel:${request.requester?.phone}`}
+                        className="px-5 py-3 border-2 border-red-600 text-red-600 rounded-xl font-semibold hover:bg-red-50 transition-colors shadow-sm hover:shadow-md"
                         title="Call Requester"
                       >
-                        <PhoneIcon className="h-5 w-5" />
+                        <PhoneIcon className="h-6 w-6" />
                       </a>
                     </div>
 
                     {/* Time Posted */}
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                      <p className="text-xs text-gray-500">
-                        Posted {dateUtils.formatTimeAgo(request.createdAt)}
+                    <div className="mt-6 pt-5 border-t border-gray-200">
+                      <p className="text-sm text-gray-500 flex items-center space-x-2">
+                        <ClockIcon className="h-4 w-4" />
+                        <span>Posted {dateUtils.formatTimeAgo(request.createdAt)}</span>
                       </p>
                     </div>
                   </div>

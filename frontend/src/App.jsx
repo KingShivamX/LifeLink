@@ -3,17 +3,17 @@ import { Helmet } from 'react-helmet-async'
 import { motion, AnimatePresence } from 'framer-motion'
 
 // Components
-import Header from './components/Header.jsx'
-import Footer from './components/Footer.jsx'
+import Header from './components/Header'
+import Footer from './components/Footer'
 
-// Pages  
-import Home from './pages/Home.jsx'
-import DonorRegistration from './pages/DonorRegistration.jsx'
-import FindDonors from './pages/FindDonors.jsx'
-import RequestBlood from './pages/RequestBlood.jsx'
-import EmergencyRequest from './pages/EmergencyRequest.jsx'
-import DonorDetail from './pages/DonorDetail.jsx'
-import ViewRequests from './pages/ViewRequests.jsx'
+// Pages
+import Home from './pages/Home'
+import FindDonors from './pages/FindDonors'
+import RegisterDonor from './pages/RegisterDonor'
+import RequestBlood from './pages/RequestBlood'
+import DonorDetail from './pages/DonorDetail'
+import ViewRequests from './pages/ViewRequests'
+import RequestDetail from './pages/RequestDetail'
 
 // Hooks
 import { useScrollToTop } from './hooks/useScrollToTop'
@@ -74,7 +74,7 @@ function App() {
                     variants={pageVariants}
                     transition={pageTransition}
                   >
-                    <DonorRegistration />
+                    <RegisterDonor />
                   </motion.div>
                 } 
               />
@@ -107,20 +107,6 @@ function App() {
                 } 
               />
               <Route 
-                path="/emergency" 
-                element={
-                  <motion.div
-                    initial="initial"
-                    animate="in"
-                    exit="out"
-                    variants={pageVariants}
-                    transition={pageTransition}
-                  >
-                    <EmergencyRequest />
-                  </motion.div>
-                } 
-              />
-              <Route 
                 path="/donor/:id" 
                 element={
                   <motion.div
@@ -145,6 +131,20 @@ function App() {
                     transition={pageTransition}
                   >
                     <ViewRequests />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path="/request/:id" 
+                element={
+                  <motion.div
+                    initial="initial"
+                    animate="in"
+                    exit="out"
+                    variants={pageVariants}
+                    transition={pageTransition}
+                  >
+                    <RequestDetail />
                   </motion.div>
                 } 
               />

@@ -72,11 +72,16 @@ export const donorsAPI = {
   }
 }
 
-// Blood Requests API
+// Requests API
 export const requestsAPI = {
-  // Get all blood requests
+  // Get all blood requests with optional filters
   getRequests: (params = {}) => {
     return api.get('/requests', { params })
+  },
+  
+  // Get single blood request by ID
+  getRequestById: (id) => {
+    return api.get(`/requests/${id}`)
   },
   
   // Create new blood request
@@ -84,9 +89,14 @@ export const requestsAPI = {
     return api.post('/requests', requestData)
   },
   
-  // Get request by ID
-  getRequest: (id) => {
-    return api.get(`/requests/${id}`)
+  // Update blood request
+  updateRequest: (id, requestData) => {
+    return api.put(`/requests/${id}`, requestData)
+  },
+  
+  // Cancel blood request
+  cancelRequest: (id) => {
+    return api.delete(`/requests/${id}`)
   }
 }
 
@@ -107,7 +117,7 @@ export const emergencyAPI = {
 export const authAPI = {
   // Login donor
   login: (credentials) => {
-    returnapi.post('/auth/login', credentials)
+    return api.post('/auth/login', credentials)
   },
   
   // Verify token

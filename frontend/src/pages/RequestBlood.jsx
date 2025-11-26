@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
-import { HeartIcon, MapPinIcon, ClockIcon, UserIcon, PhoneIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import { HeartIcon, MapPinIcon, ClockIcon, UserIcon, PhoneIcon, ExclamationTriangleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { requestsAPI } from '../services/api';
 
 const RequestBlood = () => {
+  const navigate = useNavigate();
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [createdRequestId, setCreatedRequestId] = useState(null);
+  
   const [formData, setFormData] = useState({
     patientName: '',
     requestorName: '',
@@ -31,6 +39,22 @@ const RequestBlood = () => {
     { value: 'critical', label: 'Critical (Immediate)', color: 'bg-red-100 text-red-800' }
   ];
 
+  // API mutation for creating blood request
+  const createRequestMutation = useMutation({
+    mutationFn: (requestData) => requestsAPI.createRequest(requestData),
+    onSuccess: (response) => {
+      const requestId = response.data?.data?.request?._id || response.data?.data?._id;
+      setCreatedRequestId(requestId);
+      setShowSuccessModal(true);
+      toast.success('Blood request submitted successfully!');
+    },
+    onError: (error) => {
+      const errorMessage = error.response?.data?.message || 'Failed to submit blood request';
+      toast.error(errorMessage);
+      console.error('Error creating request:', error);
+    }
+  });
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -39,9 +63,70 @@ const RequestBlood = () => {
     }));
   };
 
+  const transformFormData = (formData) => {
+    // Map urgency level
+    const urgencyMap = {
+      'routine': 'low',
+      'urgent': 'high',
+      'critical': 'critical'
+    };
+
+    // Split patient name
+    const nameParts = formData.patientName.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || 'N/A';
+
+    // Combine date and time for transfusion date
+    const transfusionDate = formData.preferredDate && formData.preferredTime
+      ? new Date(`${formData.preferredDate}T${formData.preferredTime}`)
+      : new Date(Date.now() + 24 * 60 * 60 * 1000); // Default to tomorrow
+
+    return {
+      requestType: formData.urgencyLevel === 'critical' ? 'emergency' : 'regular',
+      urgencyLevel: urgencyMap[formData.urgencyLevel] || 'low',
+      patient: {
+        firstName,
+        lastName,
+        age: null,
+        gender: null
+      },
+      requestor: {
+        name: formData.requestorName,
+        phone: formData.contactPhone,
+        email: formData.contactEmail,
+        relationship: formData.relationship
+      },
+      bloodRequirement: {
+        bloodType: formData.bloodType,
+        unitsNeeded: parseInt(formData.unitsNeeded),
+        componentType: 'whole_blood'
+      },
+      medicalInfo: {
+        hospital: formData.hospital,
+        hospitalAddress: formData.hospitalAddress,
+        condition: formData.medicalCondition || 'Not specified',
+        transfusionDate,
+        doctorName: formData.doctorName,
+        doctorContact: formData.doctorPhone || formData.contactPhone
+      },
+      location: {
+        type: 'Point',
+        coordinates: [0, 0], // Default coordinates (can be improved with geocoding)
+        address: formData.hospitalAddress,
+        city: formData.city,
+        state: 'Unknown',
+        zipCode: formData.zipCode
+      },
+      notes: formData.additionalNotes || ''
+    };
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Blood request submitted:', formData);
+    
+    // Transform and submit data
+    const requestData = transformFormData(formData);
+    createRequestMutation.mutate(requestData);
   };
 
   const getUrgencyColor = (level) => {
@@ -374,15 +459,30 @@ const RequestBlood = () => {
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 pt-6">
               <button
                 type="submit"
-                className="flex-1 bg-gradient-to-r from-primary-600 to-life-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-primary-700 hover:to-life-700 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center justify-center space-x-2"
+                disabled={createRequestMutation.isPending}
+                className={`flex-1 bg-gradient-to-r from-primary-600 to-life-600 text-white px-8 py-4 rounded-xl font-semibold transform transition-all duration-200 shadow-lg flex items-center justify-center space-x-2 ${
+                  createRequestMutation.isPending 
+                    ? 'opacity-70 cursor-not-allowed' 
+                    : 'hover:from-primary-700 hover:to-life-700 hover:scale-105'
+                }`}
               >
-                <HeartIcon className="h-5 w-5" />
-                <span>Submit Blood Request</span>
+                {createRequestMutation.isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>Submitting...</span>
+                  </>
+                ) : (
+                  <>
+                    <HeartIcon className="h-5 w-5" />
+                    <span>Submit Blood Request</span>
+                  </>
+                )}
               </button>
               
               <button
                 type="button"
-                className="flex-1 sm:flex-none bg-gray-200 text-gray-700 px-8 py-4 rounded-xl font-semibold hover:bg-gray-300 transition-all duration-200"
+                disabled={createRequestMutation.isPending}
+                className="flex-1 sm:flex-none bg-gray-200 text-gray-700 px-8 py-4 rounded-xl font-semibold hover:bg-gray-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Save Draft
               </button>
@@ -424,6 +524,71 @@ const RequestBlood = () => {
             </div>
           </div>
         </div>
+
+        {/* Success Modal */}
+        {showSuccessModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl transform transition-all">
+              <div className="text-center">
+                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                  <CheckCircleIcon className="h-10 w-10 text-green-600" />
+                </div>
+                
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  Request Submitted Successfully!
+                </h3>
+                
+                <p className="text-gray-600 mb-6">
+                  Your blood request has been created and compatible donors in your area are being notified.
+                  {createdRequestId && (
+                    <span className="block mt-2 text-sm text-gray-500">
+                      Request ID: <code className="bg-gray-100 px-2 py-1 rounded">{createdRequestId}</code>
+                    </span>
+                  )}
+                </p>
+
+                <div className="space-y-3">
+                  <button
+                    onClick={() => navigate('/requests')}
+                    className="w-full bg-gradient-to-r from-primary-600 to-life-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-primary-700 hover:to-life-700 transition-all duration-200"
+                  >
+                    View All Requests
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      setShowSuccessModal(false);
+                      // Reset form
+                      setFormData({
+                        patientName: '',
+                        requestorName: '',
+                        relationship: '',
+                        contactPhone: '',
+                        contactEmail: '',
+                        bloodType: '',
+                        unitsNeeded: '1',
+                        urgencyLevel: 'routine',
+                        hospital: '',
+                        hospitalAddress: '',
+                        city: '',
+                        zipCode: '',
+                        medicalCondition: '',
+                        additionalNotes: '',
+                        preferredDate: '',
+                        preferredTime: '',
+                        doctorName: '',
+                        doctorPhone: ''
+                      });
+                    }}
+                    className="w-full bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-all duration-200"
+                  >
+                    Create Another Request
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

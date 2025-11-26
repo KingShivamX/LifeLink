@@ -11,9 +11,10 @@ const Header = () => {
 
   const navigationItems = [
     { name: 'Home', path: '/', icon: HeartIcon },
-    { name: 'Find Donors', path: '/find-donors', icon: MapPinIcon },
-    { name: 'Register as Donor', path: '/register', icon: UserPlusIcon },
-    { name: 'Request Blood', path: '/request', icon: HeartIcon },
+    { name: 'Donors', path: '/find-donors', icon: MapPinIcon },
+    { name: 'Requests', path: '/requests', icon: HeartIcon },
+    { name: 'Register', path: '/register', icon: UserPlusIcon },
+    { name: 'Request', path: '/request', icon: HeartIcon },
   ];
 
   return (

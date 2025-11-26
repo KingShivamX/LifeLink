@@ -38,28 +38,27 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-8">
             {navigationItems.map((item) => {
               const IconComponent = item.icon;
+              const isRequestButton = item.path === '/request';
+              
               return (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${
-                    isActive(item.path)
-                      ? 'bg-primary-50 text-primary-700 border-2 border-primary-200'
-                      : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
-                  }`}
+                  className={
+                    isRequestButton
+                      ? 'bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-lg font-semibold hover:from-red-700 hover:to-red-800 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center space-x-2'
+                      : `flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                          isActive(item.path)
+                            ? 'bg-primary-50 text-primary-700 border-2 border-primary-200'
+                            : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                        }`
+                  }
                 >
                   <IconComponent className="h-5 w-5" />
                   <span className="font-medium">{item.name}</span>
                 </Link>
               );
             })}
-            <Link
-              to="/emergency"
-              className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-lg font-semibold hover:from-red-700 hover:to-red-800 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center space-x-2"
-            >
-              <PhoneIcon className="h-5 w-5" />
-              <span>EMERGENCY</span>
-            </Link>
           </nav>
 
           <button
@@ -86,30 +85,28 @@ const Header = () => {
               <div className="space-y-2 pt-4 pb-4">
               {navigationItems.map((item) => {
                 const IconComponent = item.icon;
+                const isRequestButton = item.path === '/request';
+                
                 return (
                   <Link
                     key={item.path}
                     to={item.path}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                      isActive(item.path)
-                        ? 'bg-primary-50 text-primary-700 border-2 border-primary-200'
-                        : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
-                    }`}
+                    className={
+                      isRequestButton
+                        ? 'bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-3 rounded-lg font-semibold hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-lg flex items-center space-x-3'
+                        : `flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                            isActive(item.path)
+                              ? 'bg-primary-50 text-primary-700 border-2 border-primary-200'
+                              : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                          }`
+                    }
                   >
                     <IconComponent className="h-5 w-5" />
                     <span className="font-medium">{item.name}</span>
                   </Link>
                 );
               })}
-              <Link
-                to="/emergency"
-                onClick={() => setIsMenuOpen(false)}
-                className="bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-3 rounded-lg font-semibold hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-lg flex items-center space-x-3 mt-4"
-              >
-                <PhoneIcon className="h-5 w-5" />
-                <span>EMERGENCY REQUEST</span>
-              </Link>
               </div>
             </motion.div>
           )}

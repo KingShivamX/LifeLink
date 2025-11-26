@@ -15,7 +15,7 @@ const startServer = async () => {
             cors: {
                 origin:
                     process.env.NODE_ENV === "production"
-                        ? ["https://lifelink.health"]
+                        ? ["https://lifelink.health", "https://life-link-wt.vercel.app"]
                         : ["http://localhost:3000", "http://localhost:5173"],
                 methods: ["GET", "POST"],
             },

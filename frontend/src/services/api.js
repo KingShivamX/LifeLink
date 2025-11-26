@@ -56,6 +56,11 @@ export const donorsAPI = {
     return api.get(`/donors/${id}`)
   },
   
+  // Get donor by ID (alias)
+  getDonorById: (id) => {
+    return api.get(`/donors/${id}`)
+  },
+  
   // Update donor availability
   updateAvailability: (id, availabilityData) => {
     return api.put(`/donors/${id}/availability`, availabilityData)
@@ -107,7 +112,7 @@ export const emergencyAPI = {
 export const authAPI = {
   // Login donor
   login: (credentials) => {
-    return api.post('/auth/login', credentials)
+    returnapi.post('/auth/login', credentials)
   },
   
   // Verify token

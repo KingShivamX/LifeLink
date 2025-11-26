@@ -12,6 +12,7 @@ import DonorRegistration from './pages/DonorRegistration.jsx'
 import FindDonors from './pages/FindDonors.jsx'
 import RequestBlood from './pages/RequestBlood.jsx'
 import EmergencyRequest from './pages/EmergencyRequest.jsx'
+import DonorDetail from './pages/DonorDetail.jsx'
 
 // Hooks
 import { useScrollToTop } from './hooks/useScrollToTop'
@@ -115,6 +116,20 @@ function App() {
                     transition={pageTransition}
                   >
                     <EmergencyRequest />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path="/donor/:id" 
+                element={
+                  <motion.div
+                    initial="initial"
+                    animate="in"
+                    exit="out"
+                    variants={pageVariants}
+                    transition={pageTransition}
+                  >
+                    <DonorDetail />
                   </motion.div>
                 } 
               />

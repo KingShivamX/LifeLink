@@ -100,34 +100,40 @@ const RequestBlood = () => {
       patient: {
         firstName,
         lastName,
-        age: null,
-        gender: null
+        age: 30, // Default age as it's not in form
+        gender: 'other', // Default gender as it's not in form
+        bloodType: formData.bloodType,
+        medicalRecordNumber: 'PENDING-' + Date.now().toString().slice(-6) // Generate temporary MRN
       },
-      requestor: {
+      requester: {
         name: formData.requestorName,
         phone: formData.contactPhone,
         email: formData.contactEmail,
-        relationship: formData.relationship
+        relationship: formData.relationship.toLowerCase() // Backend expects lowercase
       },
       bloodRequirement: {
-        bloodType: formData.bloodType,
         unitsNeeded: parseInt(formData.unitsNeeded),
         componentType: 'whole_blood'
       },
       medicalInfo: {
-        hospital: formData.hospital,
-        hospitalAddress: formData.hospitalAddress,
-        condition: formData.medicalCondition || 'Not specified',
+        hospital: {
+          name: formData.hospital,
+          address: formData.hospitalAddress,
+          contactNumber: formData.contactPhone // Use requester phone as fallback
+        },
+        diagnosis: formData.medicalCondition || 'Not specified',
         transfusionDate,
-        doctorName: formData.doctorName,
-        doctorContact: formData.doctorPhone || formData.contactPhone
+        doctor: {
+          name: formData.doctorName,
+          contactNumber: formData.doctorPhone || formData.contactPhone
+        }
       },
       location: {
         type: 'Point',
-        coordinates: [0, 0], // Default coordinates (can be improved with geocoding)
+        coordinates: [73.8567, 18.5204], // Default to Pune coordinates (since user is in Pune)
         address: formData.hospitalAddress,
         city: formData.city,
-        state: 'Unknown',
+        state: 'Maharashtra', // Default state
         zipCode: formData.zipCode
       },
       notes: formData.additionalNotes || ''

@@ -4,6 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { Helmet } from 'react-helmet-async'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import L from 'leaflet'
 import {
   ArrowLeftIcon,
   MapPinIcon,
@@ -24,6 +26,14 @@ import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid'
 import { donorsAPI } from '../services/api'
 import { useAppStore } from '../store/useStore'
 import { bloodTypeStyles, locationUtils, dateUtils } from '../utils'
+
+// Fix for default marker icon in Leaflet
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+})
 
 const DonorDetail = () => {
   const { id } = useParams()
@@ -137,6 +147,7 @@ const DonorDetail = () => {
   const distance = calculateDistance()
   const averageRating = donor.averageRating || 4.5
   const reviewCount = donor.reviewCount || 0
+  const donorCoords = donor.location?.coordinates ? [donor.location.coordinates[1], donor.location.coordinates[0]] : null
 
   return (
     <>
@@ -146,7 +157,7 @@ const DonorDetail = () => {
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Back Button */}
           <motion.button
@@ -266,6 +277,49 @@ const DonorDetail = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Map Card */}
+              {donorCoords && (
+                <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+                  <div className="px-8 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+                    <h2 className="text-xl font-bold text-gray-900 flex items-center space-x-2">
+                      <MapPinIcon className="h-6 w-6 text-blue-600" />
+                      <span>Donor Location</span>
+                    </h2>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {donor.address?.street}, {donor.address?.city}, {donor.address?.state} {donor.address?.zipCode}
+                    </p>
+                  </div>
+                  <div className="h-96 w-full">
+                    <MapContainer
+                      center={donorCoords}
+                      zoom={13}
+                      style={{ height: '100%', width: '100%' }}
+                      scrollWheelZoom={false}
+                    >
+                      <TileLayer
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      />
+                      <Marker position={donorCoords}>
+                        <Popup>
+                          <div className="text-center">
+                            <p className="font-semibold text-gray-900">
+                              {donor.firstName} {donor.lastName}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {donor.address?.city}, {donor.address?.state}
+                            </p>
+                            <p className="text-xs text-blue-600 font-medium mt-1">
+                              Blood Type: {donor.bloodType}
+                            </p>
+                          </div>
+                        </Popup>
+                      </Marker>
+                    </MapContainer>
+                  </div>
+                </div>
+              )}
 
               {/* Additional Info Card */}
               <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">

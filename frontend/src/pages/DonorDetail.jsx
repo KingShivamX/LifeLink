@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Helmet } from 'react-helmet-async'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
@@ -39,10 +39,6 @@ const DonorDetail = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const { userLocation } = useAppStore()
-  
-  const [showContactModal, setShowContactModal] = useState(false)
-  const [contactMethod, setContactMethod] = useState('phone')
-  const [message, setMessage] = useState('')
 
   // Fetch donor details
   const { data: donorData, isLoading, error } = useQuery({
@@ -72,27 +68,13 @@ const DonorDetail = () => {
 
   // Handle contact action
   const handleContact = (method) => {
-    setContactMethod(method)
-    
     if (method === 'phone' && donor?.phone) {
       window.open(`tel:${donor.phone}`)
       toast.success(`Calling ${donor.firstName}...`)
     } else if (method === 'email' && donor?.email) {
       window.open(`mailto:${donor.email}?subject=Blood Donation Request - LifeLink`)
       toast.success(`Opening email client...`)
-    } else {
-      setShowContactModal(true)
     }
-  }
-
-  // Handle message submission
-  const handleSendMessage = async (e) => {
-    e.preventDefault()
-    
-    // In a real app, this would send the message via API
-    toast.success('Message sent! The donor will be notified.')
-    setShowContactModal(false)
-    setMessage('')
   }
 
   // Loading state
@@ -248,33 +230,18 @@ const DonorDetail = () => {
                   </div>
 
                   {/* Contact Actions */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <button
-                      onClick={() => handleContact('phone')}
-                      disabled={!donor.availability?.isAvailable}
-                      className={`flex items-center justify-center space-x-2 px-6 py-4 rounded-xl font-semibold transition-all duration-200 ${
-                        donor.availability?.isAvailable
-                          ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transform hover:scale-105'
-                          : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                      }`}
-                    >
-                      <PhoneIcon className="h-5 w-5" />
-                      <span>Call Now</span>
-                    </button>
-                    
-                    <button
-                      onClick={() => handleContact('message')}
-                      disabled={!donor.availability?.isAvailable}
-                      className={`flex items-center justify-center space-x-2 px-6 py-4 rounded-xl font-semibold transition-all duration-200 ${
-                        donor.availability?.isAvailable
-                          ? 'bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50'
-                          : 'bg-gray-200 text-gray-500 cursor-not-allowed border-2 border-gray-300'
-                      }`}
-                    >
-                      <EnvelopeIcon className="h-5 w-5" />
-                      <span>Send Message</span>
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => handleContact('phone')}
+                    disabled={!donor.availability?.isAvailable}
+                    className={`w-full flex items-center justify-center space-x-2 px-6 py-4 rounded-xl font-semibold transition-all duration-200 ${
+                      donor.availability?.isAvailable
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transform hover:scale-105'
+                        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    <PhoneIcon className="h-5 w-5" />
+                    <span>Call Now</span>
+                  </button>
                 </div>
               </div>
 
@@ -488,57 +455,6 @@ const DonorDetail = () => {
         </div>
       </div>
 
-      {/* Contact Modal */}
-      <AnimatePresence>
-        {showContactModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-            onClick={() => setShowContactModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Send Message to {donor.firstName}
-              </h2>
-              
-              <form onSubmit={handleSendMessage}>
-                <textarea
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Enter your message here... Please include details about your blood requirement."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                  rows={6}
-                  required
-                />
-                
-                <div className="flex space-x-3 mt-6">
-                  <button
-                    type="submit"
-                    className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-                  >
-                    Send Message
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowContactModal(false)}
-                    className="px-6 py-3 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   )
 }

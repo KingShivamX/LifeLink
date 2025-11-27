@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
@@ -13,7 +14,8 @@ import {
   ClockIcon,
   UserIcon,
   AdjustmentsHorizontalIcon,
-  XMarkIcon
+  XMarkIcon,
+  EyeIcon
 } from '@heroicons/react/24/outline'
 
 import { donorsAPI } from '../services/api'
@@ -21,6 +23,7 @@ import { useAppStore } from '../store/useStore'
 import { bloodTypeStyles, locationUtils, dateUtils } from '../utils'
 
 const FindDonors = () => {
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { userLocation, getCurrentLocation } = useAppStore()
   
@@ -98,38 +101,6 @@ const FindDonors = () => {
       radius: 10,
       searchTerm: ''
     })
-  }
-
-  // Contact donor
-  const handleContactDonor = (donor) => {
-    setSelectedDonor(donor)
-    
-    // Create contact options
-    const contactOptions = []
-    
-    if (donor.phone) {
-      contactOptions.push({
-        type: 'phone',
-        value: donor.phone,
-        action: () => window.open(`tel:${donor.phone}`)
-      })
-    }
-    
-    if (donor.email) {
-      contactOptions.push({
-        type: 'email', 
-        value: donor.email,
-        action: () => window.open(`mailto:${donor.email}?subject=Blood Donation Request - LifeLink`)
-      })
-    }
-    
-    // For demo, we'll show the first available option
-    if (contactOptions.length > 0) {
-      contactOptions[0].action()
-      toast.success(`Contacting ${donor.firstName} ${donor.lastName}`)
-    } else {
-      toast.error('Contact information not available')
-    }
   }
 
   // Calculate distance if user location is available
@@ -373,13 +344,14 @@ const FindDonors = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 border border-gray-100"
+                    className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 cursor-pointer"
+                    onClick={() => navigate(`/donor/${donor._id}`)}
                   >
                     {/* Donor Header */}
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center space-x-3">
-                        <div className="bg-gray-100 p-2 rounded-full">
-                          <UserIcon className="h-6 w-6 text-gray-600" />
+                        <div className="bg-gradient-to-br from-blue-100 to-indigo-100 p-2 rounded-full">
+                          <UserIcon className="h-6 w-6 text-blue-600" />
                         </div>
                         <div>
                           <h3 className="font-semibold text-gray-900">
@@ -446,20 +418,16 @@ const FindDonors = () => {
                       </div>
                     )}
 
-                    {/* Contact Button */}
+                    {/* View Details Button */}
                     <button
-                      onClick={() => handleContactDonor(donor)}
-                      disabled={!donor.availability?.isAvailable}
-                      className={`w-full py-2.5 px-4 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2 ${
-                        donor.availability?.isAvailable
-                          ? 'bg-blue-600 text-white hover:bg-blue-700'
-                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        navigate(`/donor/${donor._id}`)
+                      }}
+                      className="w-full py-2.5 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transform hover:scale-105"
                     >
-                      <PhoneIcon className="h-4 w-4" />
-                      <span>
-                        {donor.availability?.isAvailable ? 'Contact Donor' : 'Not Available'}
-                      </span>
+                      <EyeIcon className="h-4 w-4" />
+                      <span>View Details</span>
                     </button>
                   </motion.div>
                 ))}

@@ -1,4 +1,4 @@
-# LifeLink VIVA Guide - Complete Technical Documentation
+Complete Technical Documentation
 
 ## 📚 Table of Contents
 

@@ -20,7 +20,11 @@ const MONGODB_URI =
 
 const defaultOrigins =
     process.env.NODE_ENV === "production"
-        ? ["https://lifelink.health", "https://life-link-wt.vercel.app"]
+        ? [
+            "https://lifelink.health", 
+            "https://life-link-wt.vercel.app",
+            "https://life-link-git-map-kingshivams-projects.vercel.app"
+          ]
         : ["http://localhost:3000", "http://localhost:5173"]
 const originsEnv = process.env.CORS_ORIGINS || process.env.ALLOWED_ORIGINS || ""
 const customOrigins = originsEnv
